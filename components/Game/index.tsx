@@ -80,7 +80,7 @@ const trun = [
 ]
 
 const Game: React.FC = () => {
-  const [symbol, setSymbol] = useState([])
+  const [symbol, setSymbol] = useState<Iturn[]>([])
 
   const start = (text: string) => {
     console.log(text)
@@ -93,7 +93,10 @@ const Game: React.FC = () => {
       trun[objIndex].name = 'O'
       trun[objIndex].value = 3
       trun[objIndex].filled = true
-      console.log(trun[objIndex])
+      //console.log(trun[objIndex])
+
+      setSymbol([...trun])
+      //console.log(symbol)
       computerTurn()
     }
   }
@@ -104,19 +107,26 @@ const Game: React.FC = () => {
     const RowH3 = trun[6].value + trun[7].value + trun[8].value
 
     const RowV1 = trun[0].value + trun[3].value + trun[6].value
+    const RowV2 = trun[1].value + trun[4].value + trun[7].value
+    const RowV3 = trun[2].value + trun[5].value + trun[8].value
 
-    //first Check
+    const LeftToRightBttm = trun[0].value + trun[4].value + trun[8].value
+    const RgihtToLeftBttm = trun[2].value + trun[4].value + trun[6].value
+
+    //Check first row
     if (RowH1 === 6) {
       console.log('h1')
-      for (let i = 0; i < Row1.length; i++) {
+      for (let i = 0; i < 3; i++) {
         if (trun[i].filled === false) {
           trun[i].name = 'X'
           trun[i].value = 3
           trun[i].filled = true
+          setSymbol([...trun])
           console.log(trun[i])
         }
       }
     }
+    //Check Second row
     if (RowH2 === 6) {
       console.log('h2')
       for (let i = 3; i <= 5; i++) {
@@ -124,12 +134,75 @@ const Game: React.FC = () => {
           trun[i].name = 'X'
           trun[i].value = 3
           trun[i].filled = true
+          setSymbol([...trun])
           console.log(trun[i])
         }
       }
     }
+    //Check Third row
+    if (RowH3 === 6) {
+      console.log('h3')
+      for (let i = 6; i <= 8; i++) {
+        if (trun[i].filled === false) {
+          trun[i].name = 'X'
+          trun[i].value = 3
+          trun[i].filled = true
+          setSymbol([...trun])
+          console.log(trun[i])
+        }
+      }
+    }
+    //Check first column
     if (RowV1 === 6) {
       for (let i = 0; i <= 6; i = i + 3) {
+        console.log(i)
+        if (trun[i].filled === false) {
+          trun[i].name = 'X'
+          trun[i].value = 3
+          trun[i].filled = true
+          console.log(trun[i])
+        }
+      }
+    }
+    //Check Second column
+    if (RowV2 === 6) {
+      for (let i = 1; i <= 7; i = i + 3) {
+        console.log(i)
+        if (trun[i].filled === false) {
+          trun[i].name = 'X'
+          trun[i].value = 3
+          trun[i].filled = true
+          console.log(trun[i])
+        }
+      }
+    }
+    //Check third column
+    if (RowV3 === 6) {
+      for (let i = 2; i <= 8; i = i + 3) {
+        console.log(i)
+        if (trun[i].filled === false) {
+          trun[i].name = 'X'
+          trun[i].value = 3
+          trun[i].filled = true
+          console.log(trun[i])
+        }
+      }
+    }
+    //Check A2 B2 C3 X
+    if (LeftToRightBttm === 6) {
+      for (let i = 0; i <= 8; i = i + 4) {
+        console.log(i)
+        if (trun[i].filled === false) {
+          trun[i].name = 'X'
+          trun[i].value = 3
+          trun[i].filled = true
+          console.log(trun[i])
+        }
+      }
+    }
+    //Check A2 B2 C3 X
+    if (RgihtToLeftBttm === 6) {
+      for (let i = 2; i <= 6; i = i + 2) {
         console.log(i)
         if (trun[i].filled === false) {
           trun[i].name = 'X'
@@ -200,7 +273,7 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              2
+              {trun[1].name}
             </Box>
           </Link>
           <Link
@@ -218,7 +291,7 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              3
+              {trun[2].name}
             </Box>
           </Link>
         </Box>
@@ -240,7 +313,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            4
+            {trun[3].name}
           </Box>
         </Link>
         <Link
@@ -258,7 +331,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            5
+            {trun[4].name}
           </Box>
         </Link>
         <Link
@@ -276,7 +349,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            6
+            {trun[5].name}
           </Box>
         </Link>
       </Box>
@@ -297,7 +370,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            7
+            {trun[6].name}
           </Box>
         </Link>
         <Link
@@ -315,7 +388,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            8
+            {trun[7].name}
           </Box>
         </Link>
         <Link
@@ -333,7 +406,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            9
+            {trun[8].name}
           </Box>
         </Link>
       </Box>
