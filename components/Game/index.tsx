@@ -1,434 +1,136 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@material-ui/core/Box'
 import Container from '@material-ui/core/Container'
 import Button from '@material-ui/core/Button'
 import Link from '@material-ui/core/Link'
 import Typography from '@material-ui/core/Typography'
+import { couldStartTrivia, updateSourceFile } from 'typescript'
+import { isBooleanObject } from 'util/types'
 
-interface Iturn {
-  id: number
-  name: string
-  value: number
-  filled: boolean
-  position: string
-}
+/*  const board: string[][] = [
+  ['', '', ''],
+  ['', '', ''],
+  ['', '', ''],
+]  */
 
-const trun = [
-  {
-    id: 1,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'A1',
-  },
-  {
-    id: 2,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'A2',
-  },
-  {
-    id: 3,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'A3',
-  },
-  {
-    id: 4,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'B1',
-  },
-  {
-    id: 5,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'B2',
-  },
-  {
-    id: 6,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'B3',
-  },
-  {
-    id: 7,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'C1',
-  },
-  {
-    id: 8,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'C2',
-  },
-  {
-    id: 9,
-    name: '',
-    value: 0,
-    filled: false,
-    position: 'C3',
-  },
+let emptyArray: any = [
+  [0, 0],
+  [0, 1],
+  [0, 2],
+  [1, 0],
+  [1, 1],
+  [1, 2],
+  [2, 0],
+  [2, 1],
+  [2, 2],
 ]
+let availableArray: any = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
 const Game: React.FC = () => {
-  const [symbol, setSymbol] = useState<Iturn[]>([])
+  const initialState = [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', ''],
+  ]
 
-  const rowH1 = []
-  const rowH2 = []
-  const rowH3 = []
-  const rowV1 = []
-  const rowV2 = []
-  const rowV3 = []
-  const lefttorightbttm = []
-  const rgihttoleftbttm = []
+  const [board, setBoard] = useState<string[][]>(initialState)
+  const [hasplay, setHasplay] = useState<boolean>(false)
+  const [winner, setWinner] = useState(null)
 
-  const start = (text: string) => {
-    console.log(text)
-  }
-
-  const play = (prop: string) => {
-    const objIndex = trun.findIndex((obj) => obj.position === prop && obj.filled === false)
-    console.log(objIndex)
-    if (objIndex !== -1) {
-      trun[objIndex].name = 'O'
-      trun[objIndex].value = 3
-      trun[objIndex].filled = true
-      console.log(trun)
-
-      setSymbol([...trun])
-      //console.log(symbol)
+  useEffect(() => {
+    if (hasplay) {
+      console.log('useEffect:', board)
+      console.log('computerPlay')
       computerTurn()
     }
+  }, [hasplay])
+
+  const AllEquals = (a: string, b: string, c: string) => {
+    return a == b && b == c && a != ''
   }
 
-  const checkForCompWhereToPut = (iStart: number, iLimit: number, iplus: number) => {
-    for (let i = iStart; i <= iLimit; i = i + iplus) {
-      if (trun[i].filled === false) {
-        trun[i].name = 'X'
-        trun[i].value = 3
-        trun[i].filled = true
-        setSymbol([...trun])
-        console.log(trun[i])
-        rowH1.push(trun[0], trun[1], trun[2])
-        rowH2.push(trun[3], trun[4], trun[5])
-        rowH3.push(trun[6], trun[7], trun[8])
-        rowV1.push(trun[0], trun[3], trun[6])
-        rowV2.push(trun[1], trun[4], trun[7])
-        rowV3.push(trun[2], trun[5], trun[8])
-        lefttorightbttm.push(trun[0], trun[4], trun[8])
-        rgihttoleftbttm.push(trun[2], trun[4], trun[6])
-        const RowHX1 = rowH1.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-        const RowHX2 = rowH2.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-        const RowHX3 = rowH3.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-        const RowVX1 = rowV1.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-        const RowVX2 = rowV2.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-        const RowVX3 = rowV3.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-        const LeftToRightBttmX = lefttorightbttm
-          .filter((i) => i.name === 'X')
-          .reduce((a, b) => a + b.value, 0)
-        const RgihtToLeftBttmX = rgihttoleftbttm
-          .filter((i) => i.name === 'X')
-          .reduce((a, b) => a + b.value, 0)
-        //Check first row
-        if (RowHX1 === 9) {
-          alert('game over')
-          return
-        }
-        //Check Second row
-        if (RowHX2 === 9) {
-          alert('game over')
-          return
-        }
-        //Check Third row
-        if (RowHX3 === 9) {
-          alert('game over')
-          return
-        }
-        //Check first column
-        if (RowVX1 === 9) {
-          alert('game over')
-          return
-        }
-        //Check Second column
-        if (RowVX2 === 9) {
-          alert('game over')
-          return
-        }
-        //Check third column
-        if (RowVX3 === 9) {
-          alert('game over')
-          return
-        }
-        //Check A2 B2 C3 X
-        if (LeftToRightBttmX === 9) {
-          alert('game over')
-          return
-        }
-        //Check A2 B2 C3 X
-        if (RgihtToLeftBttmX === 9) {
-          alert('game over')
-          return
-        }
+  const Reset = () => {
+    availableArray = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+    setBoard(initialState)
+    setWinner(null)
+  }
+  function checkWinner() {
+    //let winner = null
+    // horizontal
+    for (let i = 0; i < 3; i++) {
+      if (AllEquals(board[i][0], board[i][1], board[i][2])) {
+        setWinner(board[i][0])
       }
     }
+
+    // Vertical
+    for (let i = 0; i < 3; i++) {
+      if (AllEquals(board[0][i], board[1][i], board[2][i])) {
+        setWinner(board[0][i])
+      }
+    }
+
+    // Diagonal
+    if (AllEquals(board[0][0], board[1][1], board[2][2])) {
+      setWinner(board[0][0])
+    }
+    if (AllEquals(board[2][0], board[1][1], board[0][2])) {
+      setWinner(board[2][0])
+    }
+
+    if (winner == null && emptyArray.length == 0) {
+      return setWinner('Tie')
+    } else {
+      return winner
+    }
+  }
+
+  const play = (indexi: number, indexj: number, other: number) => {
+    debugger
+    if (board[indexi][indexj] === '') {
+      availableArray[other] = null
+      updateBoard(indexi, indexj, 'O')
+      setHasplay(!hasplay)
+
+      //console.log(availableArray)
+      checkWinner()
+
+      //computerTurn()
+    }
+  }
+
+  const updateBoard = (x: number, y: number, value: string) => {
+    setBoard(
+      Object.assign([...board], {
+        [x]: Object.assign([...board[x]], {
+          [y]: value,
+        }),
+      })
+    )
   }
 
   const computerTurn = () => {
-    rowH1.push(trun[0], trun[1], trun[2])
-    rowH2.push(trun[3], trun[4], trun[5])
-    rowH3.push(trun[6], trun[7], trun[8])
+    var availableIndexes = availableArray.filter((index: number) => availableArray[index] != null)
+    var selectedIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)]
 
-    rowV1.push(trun[0], trun[3], trun[6])
-    rowV2.push(trun[1], trun[4], trun[7])
-    rowV3.push(trun[2], trun[5], trun[8])
+    console.log(selectedIndex)
+    console.log(availableArray)
+    let spot = emptyArray[selectedIndex]
 
-    lefttorightbttm.push(trun[0], trun[4], trun[8])
-    rgihttoleftbttm.push(trun[2], trun[4], trun[6])
+    let i = spot[0]
+    let j = spot[1]
+    debugger
+    //board[i][j] = 'X'
+    //setPlayer('X')
+    availableArray[selectedIndex] = null
 
-    const RowHX1 = rowH1.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-    const RowHX2 = rowH2.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-    const RowHX3 = rowH3.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
+    console.log(board)
+    updateBoard(i, j, 'X')
 
-    const RowVX1 = rowV1.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-    const RowVX2 = rowV2.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
-    const RowVX3 = rowV3.filter((i) => i.name === 'X').reduce((a, b) => a + b.value, 0)
+    checkWinner()
 
-    const LeftToRightBttmX = lefttorightbttm
-      .filter((i) => i.name === 'X')
-      .reduce((a, b) => a + b.value, 0)
-    const RgihtToLeftBttmX = rgihttoleftbttm
-      .filter((i) => i.name === 'X')
-      .reduce((a, b) => a + b.value, 0)
-
-    const RowH1 = rowH1.filter((i) => i.name === 'O').reduce((a, b) => a + b.value, 0)
-    const RowH2 = rowH2.filter((i) => i.name === 'O').reduce((a, b) => a + b.value, 0)
-    const RowH3 = rowH3.filter((i) => i.name === 'O').reduce((a, b) => a + b.value, 0)
-
-    const RowV1 = rowV1.filter((i) => i.name === 'O').reduce((a, b) => a + b.value, 0)
-    const RowV2 = rowV2.filter((i) => i.name === 'O').reduce((a, b) => a + b.value, 0)
-    const RowV3 = rowV3.filter((i) => i.name === 'O').reduce((a, b) => a + b.value, 0)
-
-    const LeftToRightBttm = lefttorightbttm
-      .filter((i) => i.name === 'O')
-      .reduce((a, b) => a + b.value, 0)
-    const RgihtToLeftBttm = rgihttoleftbttm
-      .filter((i) => i.name === 'O')
-      .reduce((a, b) => a + b.value, 0)
-
-    //check winning position
-    //Check first row
-    if (RowHX1 === 6) {
-      checkForCompWhereToPut(0, 2, 1)
-      return
-    } else if (RowHX1 === 9) {
-      alert('game over')
-      return
-    }
-    //Check Second row
-    if (RowHX2 === 6) {
-      checkForCompWhereToPut(3, 5, 1)
-      return
-    }
-    //Check Third row
-    if (RowHX3 === 6) {
-      checkForCompWhereToPut(6, 8, 1)
-      return
-    }
-    //Check first column
-    if (RowVX1 === 6) {
-      checkForCompWhereToPut(0, 6, 3)
-      return
-    }
-    //Check Second column
-    if (RowVX2 === 6) {
-      checkForCompWhereToPut(1, 7, 3)
-      return
-    }
-    //Check third column
-    if (RowVX3 === 6) {
-      checkForCompWhereToPut(2, 8, 3)
-      return
-    }
-    //Check A2 B2 C3 X
-    if (LeftToRightBttmX === 6) {
-      checkForCompWhereToPut(0, 8, 4)
-      return
-    }
-    //Check A2 B2 C3 X
-    if (RgihtToLeftBttmX === 6) {
-      checkForCompWhereToPut(2, 6, 2)
-      return
-    }
-
-    //check if not winning position then check for turn Check first row
-    if (RowH1 === 6) {
-      checkForCompWhereToPut(0, 2, 1)
-      return
-    }
-    //Check Second row
-    if (RowH2 === 6) {
-      checkForCompWhereToPut(3, 5, 1)
-      return
-    }
-    //Check Third row
-    if (RowH3 === 6) {
-      checkForCompWhereToPut(6, 8, 1)
-      return
-    }
-    //Check first column
-    if (RowV1 === 6) {
-      checkForCompWhereToPut(0, 6, 3)
-      return
-    }
-    //Check Second column
-    if (RowV2 === 6) {
-      checkForCompWhereToPut(1, 7, 3)
-      return
-    }
-    //Check third column
-    if (RowV3 === 6) {
-      checkForCompWhereToPut(2, 8, 3)
-      return
-    }
-    //Check A2 B2 C3 X
-    if (LeftToRightBttm === 6) {
-      checkForCompWhereToPut(0, 8, 4)
-      return
-    }
-    //Check A2 B2 C3 X
-    if (RgihtToLeftBttm === 6) {
-      checkForCompWhereToPut(2, 6, 2)
-      return
-    }
-    /*     if (RowH1 === 6) {
-      console.log('h1')
-      for (let i = 0; i < 3; i++) {
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          setSymbol([...trun])
-          console.log(trun[i])
-          return
-        }
-      }
-    } 
-    //Check Second row
-    if (RowH2 === 6) {
-      console.log('h2')
-      for (let i = 3; i <= 5; i++) {
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          setSymbol([...trun])
-          console.log(trun[i])
-          return
-        }
-      }
-    }
-    //Check Third row
-    if (RowH3 === 6) {
-      console.log('h3')
-      for (let i = 6; i <= 8; i++) {
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          setSymbol([...trun])
-          console.log(trun[i])
-          return
-        }
-      }
-    }
-    //Check first column
-    if (RowV1 === 6) {
-      for (let i = 0; i <= 6; i = i + 3) {
-        console.log(i)
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          console.log(trun[i])
-          return
-        }
-      }
-    }
-    //Check Second column
-    if (RowV2 === 6) {
-      for (let i = 1; i <= 7; i = i + 3) {
-        console.log(i)
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          console.log(trun[i])
-          return
-        }
-      }
-    }
-    //Check third column
-    if (RowV3 === 6) {
-      for (let i = 2; i <= 8; i = i + 3) {
-        console.log(i)
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          console.log(trun[i])
-          return
-        }
-      }
-    }
-    //Check A2 B2 C3 X
-    if (LeftToRightBttm === 6) {
-      for (let i = 0; i <= 8; i = i + 4) {
-        console.log(i)
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          console.log(trun[i])
-          return
-        }
-      }
-    }
-    //Check A2 B2 C3 X
-    if (RgihtToLeftBttm === 6) {
-      for (let i = 2; i <= 6; i = i + 2) {
-        console.log(i)
-        if (trun[i].filled === false) {
-          trun[i].name = 'X'
-          trun[i].value = 3
-          trun[i].filled = true
-          console.log(trun[i])
-          return
-        }
-      }
-    }*/
-
-    let ListOfFalse = trun.filter((x) => x.filled === false).map((x) => x.id)
-    console.log(ListOfFalse)
-    const random = Math.floor(Math.random() * ListOfFalse.length)
-    console.log(random)
-    const i = random
-    console.log(ListOfFalse[random])
-    if (trun[i].filled === false) {
-      trun[i].name = 'X'
-      trun[i].value = 3
-      trun[i].filled = true
-      console.log(trun[i])
-      return
-    }
+    console.log('board:', board)
   }
 
   return (
@@ -439,30 +141,23 @@ const Game: React.FC = () => {
           variant="contained"
           color="primary"
           onClick={() => {
-            start('you')
+            Reset()
           }}
         >
-          You First = O
+          Reset
         </Button>
-        <Button
-          size="small"
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            start('computer')
-          }}
-        >
-          Computer First = X
-        </Button>
+        <Typography color="primary">Computer = X, User = O</Typography>
       </Box>
+      <Box>Winner : {winner}</Box>
       <Box>
         <Box display="flex" justifyContent="center">
           <Link
             onClick={() => {
-              play('A1')
+              play(0, 0, 0)
             }}
             href="#"
             component="button"
+            disabled={winner}
           >
             <Box
               border={1}
@@ -472,15 +167,16 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              <Typography component="h2"> {trun[0].name}</Typography>
+              <Typography component="h2"> {board[0][0]}</Typography>
             </Box>
           </Link>
           <Link
             onClick={() => {
-              play('A2')
+              play(0, 1, 1)
             }}
             href="#"
             component="button"
+            disabled={winner}
           >
             <Box
               border={1}
@@ -490,15 +186,16 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              {trun[1].name}
+              {board[0][1]}
             </Box>
           </Link>
           <Link
             onClick={() => {
-              play('A3')
+              play(0, 2, 2)
             }}
             href="#"
             component="button"
+            disabled={winner}
           >
             <Box
               border={1}
@@ -508,7 +205,7 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              {trun[2].name}
+              {board[0][2]}
             </Box>
           </Link>
         </Box>
@@ -517,9 +214,10 @@ const Game: React.FC = () => {
       <Box display="flex" justifyContent="center">
         <Link
           onClick={() => {
-            play('B1')
+            play(1, 0, 3)
           }}
           href="#"
+          disabled={winner}
           component="button"
         >
           <Box
@@ -530,15 +228,16 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {trun[3].name}
+            {board[1][0]}
           </Box>
         </Link>
         <Link
           onClick={() => {
-            play('B2')
+            play(1, 1, 4)
           }}
           href="#"
           component="button"
+          disabled={winner}
         >
           <Box
             border={1}
@@ -548,15 +247,16 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {trun[4].name}
+            {board[1][1]}
           </Box>
         </Link>
         <Link
           onClick={() => {
-            play('B3')
+            play(1, 2, 5)
           }}
           href="#"
           component="button"
+          disabled={winner}
         >
           <Box
             border={1}
@@ -566,7 +266,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {trun[5].name}
+            {board[1][2]}
           </Box>
         </Link>
       </Box>
@@ -574,10 +274,11 @@ const Game: React.FC = () => {
       <Box display="flex" justifyContent="center">
         <Link
           onClick={() => {
-            play('C1')
+            play(2, 0, 6)
           }}
           href="#"
           component="button"
+          disabled={winner}
         >
           <Box
             border={1}
@@ -587,14 +288,15 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {trun[6].name}
+            {board[2][0]}
           </Box>
         </Link>
         <Link
           onClick={() => {
-            play('C2')
+            play(2, 1, 7)
           }}
           href="#"
+          disabled={winner}
           component="button"
         >
           <Box
@@ -605,12 +307,13 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {trun[7].name}
+            {board[2][1]}
           </Box>
         </Link>
         <Link
+          disabled={winner}
           onClick={() => {
-            play('C3')
+            play(2, 2, 8)
           }}
           href="#"
           component="button"
@@ -623,7 +326,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {trun[8].name}
+            {board[2][2]}
           </Box>
         </Link>
       </Box>
