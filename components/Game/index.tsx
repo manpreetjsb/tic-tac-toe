@@ -4,14 +4,7 @@ import Container from '@material-ui/core/Container'
 import Button from '@material-ui/core/Button'
 import Link from '@material-ui/core/Link'
 import Typography from '@material-ui/core/Typography'
-import { couldStartTrivia, updateSourceFile } from 'typescript'
-import { isBooleanObject } from 'util/types'
-
-/*  const board: string[][] = [
-  ['', '', ''],
-  ['', '', ''],
-  ['', '', ''],
-]  */
+import { PlayersTypes } from './game.styles'
 
 let emptyArray: any = [
   [0, 0],
@@ -39,8 +32,6 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     if (hasplay) {
-      console.log('useEffect:', board)
-      console.log('computerPlay')
       computerTurn()
     }
   }, [hasplay])
@@ -56,7 +47,6 @@ const Game: React.FC = () => {
     setWinner(null)
   }
   function checkWinner() {
-    //let winner = null
     // horizontal
     for (let i = 0; i < 3; i++) {
       if (AllEquals(board[i][0], board[i][1], board[i][2])) {
@@ -78,8 +68,8 @@ const Game: React.FC = () => {
     if (AllEquals(board[2][0], board[1][1], board[0][2])) {
       setWinner(board[2][0])
     }
-
-    if (winner == null && emptyArray.length == 0) {
+    var availableIndexes = availableArray.filter((index: number) => availableArray[index] != null)
+    if (winner == null && availableIndexes.length == 0) {
       return setWinner('Tie')
     } else {
       return winner
@@ -87,16 +77,12 @@ const Game: React.FC = () => {
   }
 
   const play = (indexi: number, indexj: number, other: number) => {
-    debugger
     if (board[indexi][indexj] === '') {
       availableArray[other] = null
+
       updateBoard(indexi, indexj, 'O')
-      setHasplay(!hasplay)
-
-      //console.log(availableArray)
       checkWinner()
-
-      //computerTurn()
+      setHasplay(!hasplay)
     }
   }
 
@@ -113,24 +99,18 @@ const Game: React.FC = () => {
   const computerTurn = () => {
     var availableIndexes = availableArray.filter((index: number) => availableArray[index] != null)
     var selectedIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)]
+    if (selectedIndex != undefined) {
+      let spot = emptyArray[selectedIndex]
 
-    console.log(selectedIndex)
-    console.log(availableArray)
-    let spot = emptyArray[selectedIndex]
+      let i = spot[0]
+      let j = spot[1]
 
-    let i = spot[0]
-    let j = spot[1]
-    debugger
-    //board[i][j] = 'X'
-    //setPlayer('X')
-    availableArray[selectedIndex] = null
-
-    console.log(board)
-    updateBoard(i, j, 'X')
+      availableArray[selectedIndex] = null
+      setHasplay(!hasplay)
+      updateBoard(i, j, 'X')
+    }
 
     checkWinner()
-
-    console.log('board:', board)
   }
 
   return (
@@ -146,9 +126,15 @@ const Game: React.FC = () => {
         >
           Reset
         </Button>
-        <Typography color="primary">Computer = X, User = O</Typography>
+        <Box m={1}>
+          <PlayersTypes>Computer = X, User = O</PlayersTypes>
+        </Box>
       </Box>
-      <Box>Winner : {winner}</Box>
+
+      <Box display="flex" justifyContent="center">
+        {winner && <Typography component="h2">Winner : {winner}</Typography>}
+      </Box>
+
       <Box>
         <Box display="flex" justifyContent="center">
           <Link
@@ -186,7 +172,7 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              {board[0][1]}
+              <Typography component="h2"> {board[0][1]}</Typography>
             </Box>
           </Link>
           <Link
@@ -205,7 +191,7 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              {board[0][2]}
+              <Typography component="h2"> {board[0][2]}</Typography>
             </Box>
           </Link>
         </Box>
@@ -228,7 +214,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {board[1][0]}
+            <Typography component="h2"> {board[1][0]}</Typography>
           </Box>
         </Link>
         <Link
@@ -247,7 +233,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {board[1][1]}
+            <Typography component="h2"> {board[1][1]}</Typography>
           </Box>
         </Link>
         <Link
@@ -266,7 +252,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {board[1][2]}
+            <Typography component="h2"> {board[1][2]}</Typography>
           </Box>
         </Link>
       </Box>
@@ -288,7 +274,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {board[2][0]}
+            <Typography component="h2"> {board[2][0]}</Typography>
           </Box>
         </Link>
         <Link
@@ -307,7 +293,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {board[2][1]}
+            <Typography component="h2">{board[2][1]}</Typography>
           </Box>
         </Link>
         <Link
@@ -326,7 +312,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {board[2][2]}
+            <Typography component="h2">{board[2][2]}</Typography>
           </Box>
         </Link>
       </Box>
