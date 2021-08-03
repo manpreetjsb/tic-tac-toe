@@ -117,6 +117,7 @@ const Game: React.FC = () => {
     <Container>
       <Box py={5} display="flex" justifyContent="center">
         <Button
+          data-testid="resetArray"
           size="small"
           variant="contained"
           color="primary"
@@ -144,6 +145,7 @@ const Game: React.FC = () => {
             href="#"
             component="button"
             disabled={winner}
+            data-testid="turn"
           >
             <Box
               border={1}
@@ -153,7 +155,9 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              <Typography component="h2"> {board[0][0]}</Typography>
+              <Typography component="h2" data-testid="turnvalue">
+                {board[0][0]}
+              </Typography>
             </Box>
           </Link>
           <Link
