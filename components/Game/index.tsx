@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Box from '@material-ui/core/Box'
 import Container from '@material-ui/core/Container'
 import Button from '@material-ui/core/Button'
@@ -6,18 +6,20 @@ import Link from '@material-ui/core/Link'
 import Typography from '@material-ui/core/Typography'
 import { PlayersTypes } from './game.styles'
 
-let emptyArray: any = [
-  [0, 0],
-  [0, 1],
-  [0, 2],
-  [1, 0],
-  [1, 1],
-  [1, 2],
-  [2, 0],
-  [2, 1],
-  [2, 2],
-]
+let currentBoard = {
+  1: '',
+  2: '',
+  3: '',
+  4: '',
+  5: '',
+  6: '',
+  7: '',
+  8: '',
+  9: '',
+}
 let availableArray: any = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+let turn = 'O'
 
 const Game: React.FC = () => {
   const initialState = [
@@ -26,91 +28,278 @@ const Game: React.FC = () => {
     ['', '', ''],
   ]
 
-  const [board, setBoard] = useState<string[][]>(initialState)
-  const [hasplay, setHasplay] = useState<boolean>(false)
-  const [winner, setWinner] = useState(null)
+  const [board, setBoard] = useState(currentBoard)
+  const [first, setFirst] = useState(0)
+  const [symbol, setSymbol] = useState(false)
 
-  useEffect(() => {
-    if (hasplay) {
-      computerTurn()
+  const [winner, setWinner] = useState<boolean>(false)
+
+  const play = (num) => {
+    if (currentBoard[num] !== '') return
+
+    currentBoard[num] = turn === 'X' ? 'O' : 'X'
+    turn = 'X'
+
+    setSymbol(true)
+    let updatedChecked = {
+      ...board,
+      board: currentBoard[num],
     }
-  }, [hasplay])
+    setBoard(updatedChecked)
 
-  const AllEquals = (a: string, b: string, c: string) => {
-    return a == b && b == c && a != ''
-  }
-
-  const Reset = () => {
-    availableArray = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-
-    setBoard(initialState)
-    setWinner(null)
-  }
-  function checkWinner() {
-    // horizontal
-    for (let i = 0; i < 3; i++) {
-      if (AllEquals(board[i][0], board[i][1], board[i][2])) {
-        setWinner(board[i][0])
+    setWinner(true)
+    if (first === 0 && board[5] === '') {
+      currentBoard[5] = 'O'
+      turn = 'O'
+      let updatedChecked = {
+        ...board,
+        board: currentBoard[5],
       }
-    }
-
-    // Vertical
-    for (let i = 0; i < 3; i++) {
-      if (AllEquals(board[0][i], board[1][i], board[2][i])) {
-        setWinner(board[0][i])
-      }
-    }
-
-    // Diagonal
-    if (AllEquals(board[0][0], board[1][1], board[2][2])) {
-      setWinner(board[0][0])
-    }
-    if (AllEquals(board[2][0], board[1][1], board[0][2])) {
-      setWinner(board[2][0])
-    }
-    var availableIndexes = availableArray.filter((index: number) => availableArray[index] != null)
-    if (winner == null && availableIndexes.length == 0) {
-      return setWinner('Tie')
+      setBoard(updatedChecked)
+      setFirst(1)
+      return
     } else {
-      return winner
+      // horizontal
+      let t = 0
+      let column = 0
+      for (let i = 1; i < 10; i = i + 3) {
+        t = t + 1
+        let r1 = currentBoard[i] === 'X' ? 3 : currentBoard[i] === 'O' ? 5 : 0
+        let r2 = currentBoard[i + 1] === 'X' ? 3 : currentBoard[i + 1] === 'O' ? 5 : 0
+        let r3 = currentBoard[i + 2] === 'X' ? 3 : currentBoard[i + 2] === 'O' ? 5 : 0
+
+        if (r1 + r2 + r3 === 9) {
+          console.log('X is winner')
+          return
+        }
+
+        if (r1 + r2 + r3 === 15) {
+          console.log('O is winner')
+          return
+        }
+
+        if (r1 + r2 + r3 === 6) {
+          if (r1 === 0) {
+            if (t === 1) {
+              column = 1
+            } else if (t === 2) {
+              column = 4
+            } else if (t === 3) {
+              column = 7
+            }
+          }
+          if (r2 === 0) {
+            if (t === 1) {
+              column = 2
+            } else if (t === 2) {
+              column = 5
+            } else if (t === 3) {
+              column = 8
+            }
+          }
+          if (r3 === 0) {
+            if (t === 1) {
+              column = 3
+            } else if (t === 2) {
+              column = 6
+            } else if (t === 3) {
+              column = 9
+            }
+          }
+
+          currentBoard[column] = turn === 'X' ? 'O' : 'X'
+          turn = 'O'
+          let updatedChecked = {
+            ...board,
+            board: currentBoard[column],
+          }
+          setBoard(updatedChecked)
+
+          console.log('currentBoard', currentBoard)
+          return
+        }
+
+        if (r1 + r2 + r3 === 10) {
+          if (r1 === 0) {
+            if (t === 1) {
+              column = 1
+            } else if (t === 2) {
+              column = 4
+            } else if (t === 3) {
+              column = 7
+            }
+          }
+          if (r2 === 0) {
+            if (t === 1) {
+              column = 2
+            } else if (t === 2) {
+              column = 5
+            } else if (t === 3) {
+              column = 8
+            }
+          }
+          if (r3 === 0) {
+            if (t === 1) {
+              column = 3
+            } else if (t === 2) {
+              column = 6
+            } else if (t === 3) {
+              column = 9
+            }
+          }
+          currentBoard[column] = 'O'
+          turn = 'O'
+          let updatedChecked = {
+            ...board,
+            board: currentBoard[column],
+          }
+          setBoard(updatedChecked)
+
+          console.log('currentBoard', currentBoard)
+          return
+        }
+      }
+
+      // vertical
+      let vt = 0
+      for (let j = 1; j < 4; j++) {
+        vt = vt + 1
+        let vr1 = currentBoard[j] === 'X' ? 3 : currentBoard[j] === 'O' ? 5 : 0
+        let vr2 = currentBoard[j + 3] === 'X' ? 3 : currentBoard[j + 3] === 'O' ? 5 : 0
+        let vr3 = currentBoard[j + 6] === 'X' ? 3 : currentBoard[j + 6] === 'O' ? 5 : 0
+
+        if (vr1 + vr2 + vr3 === 9) {
+          console.log('X is winner')
+          return
+        }
+
+        if (vr1 + vr2 + vr3 === 15) {
+          console.log('O is winner')
+          return
+        }
+
+        if (vr1 + vr2 + vr3 === 6) {
+          if (vr1 === 0) {
+            if (vt === 1) {
+              column = 1
+            } else if (vt === 2) {
+              column = 2
+            } else if (vt === 3) {
+              column = 3
+            }
+          }
+          if (vr2 === 0) {
+            if (vt === 1) {
+              column = 4
+            } else if (vt === 2) {
+              column = 5
+            } else if (vt === 3) {
+              column = 8
+            }
+          }
+          if (vr3 === 0) {
+            if (vt === 1) {
+              column = 6
+            } else if (vt === 2) {
+              column = 8
+            } else if (vt === 3) {
+              column = 9
+            }
+          }
+          currentBoard[column] = turn === 'X' ? 'O' : 'X'
+          turn = 'O'
+          let updatedChecked = {
+            ...board,
+            board: currentBoard[column],
+          }
+          setBoard(updatedChecked)
+
+          return
+        }
+
+        if (vr1 + vr2 + vr3 === 10) {
+          if (vr1 === 0) {
+            if (vt === 1) {
+              column = 1
+            } else if (vt === 2) {
+              column = 2
+            } else if (vt === 3) {
+              column = 3
+            }
+          }
+          if (vr2 === 0) {
+            if (vt === 1) {
+              column = 4
+            } else if (vt === 2) {
+              column = 5
+            } else if (vt === 3) {
+              column = 8
+            }
+          }
+          if (vr3 === 0) {
+            if (vt === 1) {
+              column = 6
+            } else if (vt === 2) {
+              column = 8
+            } else if (vt === 3) {
+              column = 9
+            }
+          }
+          currentBoard[column] = 'O'
+          turn = 'O'
+          let updatedChecked = {
+            ...board,
+            board: currentBoard[column],
+          }
+          setBoard(updatedChecked)
+
+          return
+        }
+      }
+
+      //dignol \
+
+      let dr1 = currentBoard[1] === 'X' ? 3 : currentBoard[1] === 'O' ? 5 : 0
+      let dr2 = currentBoard[5] === 'X' ? 3 : currentBoard[5] === 'O' ? 5 : 0
+      let dr3 = currentBoard[9] === 'X' ? 3 : currentBoard[9] === 'O' ? 5 : 0
+
+      if (dr1 + dr2 + dr3 === 6) {
+        column = dr1 === 0 ? 1 : dr2 === 0 ? 5 : dr3 === 0 ? 9 : null
+        currentBoard[column] = turn === 'X' ? 'O' : 'X'
+        turn = 'O'
+        let updatedChecked = {
+          ...board,
+          board: currentBoard[column],
+        }
+        setBoard(updatedChecked)
+        return
+      }
+      //dignol /
+      let dr4 = currentBoard[3] === 'X' ? 3 : currentBoard[3] === 'O' ? 5 : 0
+      let dr5 = currentBoard[5] === 'X' ? 3 : currentBoard[5] === 'O' ? 5 : 0
+      let dr6 = currentBoard[7] === 'X' ? 3 : currentBoard[7] === 'O' ? 5 : 0
+      if (dr4 + dr5 + dr6 === 6) {
+        column = dr4 === 0 ? 3 : dr5 === 0 ? 5 : dr6 === 0 ? 7 : null
+        currentBoard[column] = turn === 'X' ? 'O' : 'X'
+        turn = 'O'
+        let updatedChecked = {
+          ...board,
+          board: currentBoard[column],
+        }
+        setBoard(updatedChecked)
+        return
+      }
     }
-  }
+    let availableIndexes = availableArray.filter((index: number) => currentBoard[index] === '')
+    let selectedIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)]
 
-  const play = (indexi: number, indexj: number, other: number) => {
-    if (board[indexi][indexj] === '') {
-      availableArray[other] = null
-
-      updateBoard(indexi, indexj, 'O')
-      checkWinner()
-      setHasplay(!hasplay)
+    currentBoard[selectedIndex] = turn === 'X' ? 'O' : 'X'
+    turn = 'O'
+    let updatedCheckedNew = {
+      ...board,
+      board: currentBoard[selectedIndex],
     }
-  }
-
-  const updateBoard = (x: number, y: number, value: string) => {
-    setBoard(
-      Object.assign([...board], {
-        [x]: Object.assign([...board[x]], {
-          [y]: value,
-        }),
-      })
-    )
-  }
-
-  const computerTurn = () => {
-    var availableIndexes = availableArray.filter((index: number) => availableArray[index] != null)
-    var selectedIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)]
-    if (selectedIndex != undefined) {
-      let spot = emptyArray[selectedIndex]
-
-      let i = spot[0]
-      let j = spot[1]
-
-      availableArray[selectedIndex] = null
-      setHasplay(!hasplay)
-      updateBoard(i, j, 'X')
-    }
-
-    checkWinner()
+    setBoard(updatedCheckedNew)
   }
 
   return (
@@ -121,30 +310,30 @@ const Game: React.FC = () => {
           size="small"
           variant="contained"
           color="primary"
-          onClick={() => {
+          /* onClick={() => {
             Reset()
-          }}
+          }} */
         >
           Reset
         </Button>
         <Box m={1}>
-          <PlayersTypes>Computer = X, User = O</PlayersTypes>
+          <PlayersTypes>Computer = O, User = X</PlayersTypes>
         </Box>
       </Box>
 
       <Box display="flex" justifyContent="center">
-        {winner && <Typography component="h2">Winner : {winner}</Typography>}
+        {/* {winner && <Typography component="h2">Winner : {winner}</Typography>} */}
       </Box>
 
       <Box>
         <Box display="flex" justifyContent="center">
           <Link
             onClick={() => {
-              play(0, 0, 0)
+              play(1)
             }}
             href="#"
             component="button"
-            disabled={winner}
+            //disabled={afterturn}
             data-testid="turn"
           >
             <Box
@@ -156,17 +345,17 @@ const Game: React.FC = () => {
               justifyContent="center"
             >
               <Typography component="h2" data-testid="turnvalue">
-                {board[0][0]}
+                {currentBoard[1]}
               </Typography>
             </Box>
           </Link>
           <Link
             onClick={() => {
-              play(0, 1, 1)
+              play(2)
             }}
             href="#"
             component="button"
-            disabled={winner}
+            //disabled={afterturn}
           >
             <Box
               border={1}
@@ -176,16 +365,16 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              <Typography component="h2"> {board[0][1]}</Typography>
+              <Typography component="h2"> {currentBoard[2]}</Typography>
             </Box>
           </Link>
           <Link
             onClick={() => {
-              play(0, 2, 2)
+              play(3)
             }}
             href="#"
             component="button"
-            disabled={winner}
+            //disabled={afterturn}
           >
             <Box
               border={1}
@@ -195,7 +384,7 @@ const Game: React.FC = () => {
               alignItems="center"
               justifyContent="center"
             >
-              <Typography component="h2"> {board[0][2]}</Typography>
+              <Typography component="h2"> {currentBoard[3]}</Typography>
             </Box>
           </Link>
         </Box>
@@ -204,10 +393,10 @@ const Game: React.FC = () => {
       <Box display="flex" justifyContent="center">
         <Link
           onClick={() => {
-            play(1, 0, 3)
+            play(4)
           }}
           href="#"
-          disabled={winner}
+          //disabled={afterturn}
           component="button"
         >
           <Box
@@ -218,16 +407,16 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Typography component="h2"> {board[1][0]}</Typography>
+            <Typography component="h2"> {currentBoard[4]}</Typography>
           </Box>
         </Link>
         <Link
           onClick={() => {
-            play(1, 1, 4)
+            play(5)
           }}
           href="#"
           component="button"
-          disabled={winner}
+          //disabled={afterturn}
         >
           <Box
             border={1}
@@ -237,16 +426,16 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Typography component="h2"> {board[1][1]}</Typography>
+            <Typography component="h2"> {currentBoard[5]}</Typography>
           </Box>
         </Link>
         <Link
           onClick={() => {
-            play(1, 2, 5)
+            play(6)
           }}
           href="#"
           component="button"
-          disabled={winner}
+          //disabled={afterturn}
         >
           <Box
             border={1}
@@ -256,7 +445,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Typography component="h2"> {board[1][2]}</Typography>
+            <Typography component="h2"> {currentBoard[6]}</Typography>
           </Box>
         </Link>
       </Box>
@@ -264,11 +453,11 @@ const Game: React.FC = () => {
       <Box display="flex" justifyContent="center">
         <Link
           onClick={() => {
-            play(2, 0, 6)
+            play(7)
           }}
           href="#"
           component="button"
-          disabled={winner}
+          //disabled={winner}
         >
           <Box
             border={1}
@@ -278,15 +467,15 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Typography component="h2"> {board[2][0]}</Typography>
+            <Typography component="h2"> {currentBoard[7]}</Typography>
           </Box>
         </Link>
         <Link
           onClick={() => {
-            play(2, 1, 7)
+            play(8)
           }}
           href="#"
-          disabled={winner}
+          //disabled={winner}
           component="button"
         >
           <Box
@@ -297,13 +486,13 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Typography component="h2">{board[2][1]}</Typography>
+            <Typography component="h2">{currentBoard[8]}</Typography>
           </Box>
         </Link>
         <Link
-          disabled={winner}
+          //disabled={winner}
           onClick={() => {
-            play(2, 2, 8)
+            play(9)
           }}
           href="#"
           component="button"
@@ -316,7 +505,7 @@ const Game: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Typography component="h2">{board[2][2]}</Typography>
+            <Typography component="h2">{currentBoard[9]}</Typography>
           </Box>
         </Link>
       </Box>
