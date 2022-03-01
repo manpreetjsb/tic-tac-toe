@@ -22,17 +22,11 @@ let availableArray: any = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 let turn = 'O'
 
 const Game: React.FC = () => {
-  const initialState = [
-    ['', '', ''],
-    ['', '', ''],
-    ['', '', ''],
-  ]
-
   const [board, setBoard] = useState(currentBoard)
   const [first, setFirst] = useState(0)
   const [symbol, setSymbol] = useState(false)
 
-  const [winner, setWinner] = useState<boolean>(false)
+  const [winner, setWinner] = useState<string>('')
 
   const play = (num) => {
     if (currentBoard[num] !== '') return
@@ -47,7 +41,6 @@ const Game: React.FC = () => {
     }
     setBoard(updatedChecked)
 
-    setWinner(true)
     if (first === 0 && board[5] === '') {
       currentBoard[5] = 'O'
       turn = 'O'
@@ -62,90 +55,36 @@ const Game: React.FC = () => {
       // horizontal
       let t = 0
       let column = 0
+
+      const horizontalRowOne = () => {
+        return t === 1 ? 1 : t === 2 ? 4 : t === 3 ? 7 : null
+      }
+      const horizontalRowTwo = () => {
+        return t === 1 ? 2 : t === 2 ? 5 : t === 3 ? 8 : null
+      }
+      const horizontalRowThree = () => {
+        return t === 1 ? 3 : t === 2 ? 6 : t === 3 ? 9 : null
+      }
+
       for (let i = 1; i < 10; i = i + 3) {
         t = t + 1
         let r1 = currentBoard[i] === 'X' ? 3 : currentBoard[i] === 'O' ? 5 : 0
         let r2 = currentBoard[i + 1] === 'X' ? 3 : currentBoard[i + 1] === 'O' ? 5 : 0
         let r3 = currentBoard[i + 2] === 'X' ? 3 : currentBoard[i + 2] === 'O' ? 5 : 0
 
-        if (r1 + r2 + r3 === 9) {
-          console.log('X is winner')
-          return
-        }
-
-        if (r1 + r2 + r3 === 15) {
-          console.log('O is winner')
-          return
-        }
-
-        if (r1 + r2 + r3 === 6) {
-          if (r1 === 0) {
-            if (t === 1) {
-              column = 1
-            } else if (t === 2) {
-              column = 4
-            } else if (t === 3) {
-              column = 7
-            }
-          }
-          if (r2 === 0) {
-            if (t === 1) {
-              column = 2
-            } else if (t === 2) {
-              column = 5
-            } else if (t === 3) {
-              column = 8
-            }
-          }
-          if (r3 === 0) {
-            if (t === 1) {
-              column = 3
-            } else if (t === 2) {
-              column = 6
-            } else if (t === 3) {
-              column = 9
-            }
-          }
-
-          currentBoard[column] = turn === 'X' ? 'O' : 'X'
-          turn = 'O'
-          let updatedChecked = {
-            ...board,
-            board: currentBoard[column],
-          }
-          setBoard(updatedChecked)
-
-          console.log('currentBoard', currentBoard)
-          return
-        }
-
+        // check for if computer can win O
         if (r1 + r2 + r3 === 10) {
           if (r1 === 0) {
-            if (t === 1) {
-              column = 1
-            } else if (t === 2) {
-              column = 4
-            } else if (t === 3) {
-              column = 7
-            }
+            column = horizontalRowOne()
+            r1 = currentBoard[column] = 5
           }
           if (r2 === 0) {
-            if (t === 1) {
-              column = 2
-            } else if (t === 2) {
-              column = 5
-            } else if (t === 3) {
-              column = 8
-            }
+            column = horizontalRowTwo()
+            r2 = currentBoard[column] = 5
           }
           if (r3 === 0) {
-            if (t === 1) {
-              column = 3
-            } else if (t === 2) {
-              column = 6
-            } else if (t === 3) {
-              column = 9
-            }
+            column = horizontalRowThree()
+            r3 = currentBoard[column] = 5
           }
           currentBoard[column] = 'O'
           turn = 'O'
@@ -155,95 +94,76 @@ const Game: React.FC = () => {
           }
           setBoard(updatedChecked)
 
-          console.log('currentBoard', currentBoard)
+          if (r1 == r2 && r2 == r3 && r1 != 0) {
+            console.log('O is winner ')
+            setWinner('O is winner')
+            return
+          }
+          return
+        }
+        // check for user is winning for X
+        if (r1 + r2 + r3 === 6) {
+          if (r1 === 0) {
+            column = horizontalRowOne()
+            r1 = currentBoard[column] = 5
+          }
+          if (r2 === 0) {
+            column = horizontalRowTwo()
+            r2 = currentBoard[column] = 5
+          }
+          if (r3 === 0) {
+            column = horizontalRowThree()
+            r3 = currentBoard[column] = 5
+          }
+
+          currentBoard[column] = turn === 'X' ? 'O' : 'X'
+          turn = 'O'
+          let updatedChecked = {
+            ...board,
+            board: currentBoard[column],
+          }
+          setBoard(updatedChecked)
+          if (r1 == r2 && r2 == r3 && r1 != 0) {
+            console.log('X is winner ')
+            setWinner('X is winner')
+            return
+          }
+
           return
         }
       }
 
       // vertical
       let vt = 0
+
+      const verticalOne = () => {
+        return vt === 1 ? 1 : vt === 2 ? 2 : vt === 3 ? 3 : null
+      }
+      const verticalTwo = () => {
+        return vt === 1 ? 4 : vt === 2 ? 5 : vt === 3 ? 6 : null
+      }
+      const verticalThree = () => {
+        return vt === 1 ? 7 : vt === 2 ? 8 : vt === 3 ? 9 : null
+      }
+
       for (let j = 1; j < 4; j++) {
         vt = vt + 1
         let vr1 = currentBoard[j] === 'X' ? 3 : currentBoard[j] === 'O' ? 5 : 0
         let vr2 = currentBoard[j + 3] === 'X' ? 3 : currentBoard[j + 3] === 'O' ? 5 : 0
         let vr3 = currentBoard[j + 6] === 'X' ? 3 : currentBoard[j + 6] === 'O' ? 5 : 0
 
-        if (vr1 + vr2 + vr3 === 9) {
-          console.log('X is winner')
-          return
-        }
-
-        if (vr1 + vr2 + vr3 === 15) {
-          console.log('O is winner')
-          return
-        }
-
-        if (vr1 + vr2 + vr3 === 6) {
-          if (vr1 === 0) {
-            if (vt === 1) {
-              column = 1
-            } else if (vt === 2) {
-              column = 2
-            } else if (vt === 3) {
-              column = 3
-            }
-          }
-          if (vr2 === 0) {
-            if (vt === 1) {
-              column = 4
-            } else if (vt === 2) {
-              column = 5
-            } else if (vt === 3) {
-              column = 8
-            }
-          }
-          if (vr3 === 0) {
-            if (vt === 1) {
-              column = 6
-            } else if (vt === 2) {
-              column = 8
-            } else if (vt === 3) {
-              column = 9
-            }
-          }
-          currentBoard[column] = turn === 'X' ? 'O' : 'X'
-          turn = 'O'
-          let updatedChecked = {
-            ...board,
-            board: currentBoard[column],
-          }
-          setBoard(updatedChecked)
-
-          return
-        }
-
         if (vr1 + vr2 + vr3 === 10) {
           if (vr1 === 0) {
-            if (vt === 1) {
-              column = 1
-            } else if (vt === 2) {
-              column = 2
-            } else if (vt === 3) {
-              column = 3
-            }
+            column = verticalOne()
+            vr1 = currentBoard[column] = 5
           }
           if (vr2 === 0) {
-            if (vt === 1) {
-              column = 4
-            } else if (vt === 2) {
-              column = 5
-            } else if (vt === 3) {
-              column = 8
-            }
+            column = verticalTwo()
+            vr2 = currentBoard[column] = 5
           }
           if (vr3 === 0) {
-            if (vt === 1) {
-              column = 6
-            } else if (vt === 2) {
-              column = 8
-            } else if (vt === 3) {
-              column = 9
-            }
+            column = verticalThree()
+            vr3 = currentBoard[column] = 5
           }
           currentBoard[column] = 'O'
           turn = 'O'
@@ -252,7 +172,38 @@ const Game: React.FC = () => {
             board: currentBoard[column],
           }
           setBoard(updatedChecked)
+          if (vr1 == vr2 && vr2 == vr3 && vr1 != 0) {
+            setWinner('O is winner')
+            return
+          }
+          return
+        }
 
+        if (vr1 + vr2 + vr3 === 6) {
+          if (vr1 === 0) {
+            column = verticalOne()
+            vr1 = currentBoard[column] = 5
+          }
+          if (vr2 === 0) {
+            column = verticalTwo()
+            vr2 = currentBoard[column] = 5
+          }
+          if (vr3 === 0) {
+            column = verticalThree()
+            vr3 = currentBoard[column] = 5
+          }
+          currentBoard[column] = turn === 'X' ? 'O' : 'X'
+          turn = 'O'
+          let updatedChecked = {
+            ...board,
+            board: currentBoard[column],
+          }
+          setBoard(updatedChecked)
+          if (vr1 == vr2 && vr2 == vr3 && vr1 != 0) {
+            console.log('X is winner ')
+            setWinner('X is winner')
+            return
+          }
           return
         }
       }
@@ -272,6 +223,12 @@ const Game: React.FC = () => {
           board: currentBoard[column],
         }
         setBoard(updatedChecked)
+
+        return
+      }
+      if (dr1 == dr2 && dr2 == dr3 && dr1 != 0) {
+        console.log(' winner ')
+        setWinner('winner')
         return
       }
       //dignol /
@@ -287,6 +244,11 @@ const Game: React.FC = () => {
           board: currentBoard[column],
         }
         setBoard(updatedChecked)
+
+        return
+      }
+      if (dr4 == dr5 && dr5 == dr6 && dr4 != 0) {
+        setWinner('X is winner')
         return
       }
     }
@@ -322,7 +284,7 @@ const Game: React.FC = () => {
       </Box>
 
       <Box display="flex" justifyContent="center">
-        {/* {winner && <Typography component="h2">Winner : {winner}</Typography>} */}
+        {winner && <Typography component="h2">Winner : {winner}</Typography>}
       </Box>
 
       <Box>
